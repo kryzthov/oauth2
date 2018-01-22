@@ -61,6 +61,9 @@ type Config struct {
 
 	// Expires optionally specifies how long the token is valid for.
 	Expires time.Duration
+
+	// Private claims to include in the JWT.
+	PrivateClaims map[string]interface{}
 }
 
 // TokenSource returns a JWT TokenSource using the configuration
@@ -104,6 +107,9 @@ func (js jwtSource) Token() (*oauth2.Token, error) {
 	}
 	if t := js.conf.Expires; t > 0 {
 		claimSet.Exp = time.Now().Add(t).Unix()
+	}
+	if js.conf.PrivateClaims != nil {
+		claimSet.PrivateClaims = js.conf.PrivateClaims
 	}
 	h := *defaultHeader
 	h.KeyID = js.conf.PrivateKeyID
